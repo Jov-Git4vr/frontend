@@ -3,6 +3,7 @@ package com.bidverse.frontend;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,48 +11,100 @@ import java.util.stream.Collectors;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 public class SellerPastBids extends JPanel {
+
+    // --- Custom Color Palette (consistent with other panels) ---
+    private static final Color SIDEBAR_COLOR = new Color(76, 0, 153);         // Deep Purple
+    private static final Color ACCENT_COLOR = new Color(147, 112, 219);       // Soft Purple
+    private static final Color BACKGROUND_COLOR = new Color(245, 245, 255);   // Light lavender-gray
+    private static final Color TABLE_HEADER_COLOR = new Color(98, 0, 238);    // Indigo
+    private static final Color TABLE_SELECTION = new Color(153, 102, 255);    // Light violet highlight
+    private static final Color TEXT_COLOR = new Color(51, 51, 51);            // Dark gray text
+    private static final Color BUTTON_COLOR = new Color(98, 0, 238);          // Purple buttons
+    private static final Color BUTTON_HOVER = new Color(123, 31, 162);        // Darker purple
+
     private final JFrame mainFrame;
     private JTable pastBidsTable;
     private DefaultTableModel tableModel;
 
     public SellerPastBids(JFrame frame) {
         this.mainFrame = frame;
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Back button
-        JButton backButton = new JButton("<- Back to Home");
+        // --- Layout & Background ---
+        setLayout(new BorderLayout(15, 15));
+        setBackground(BACKGROUND_COLOR);
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // --- Top Navigation (Back Button) ---
+        JButton backButton = new JButton("← Back to Home");
+        styleButton(backButton, BUTTON_COLOR, Color.WHITE);
         backButton.addActionListener(e -> Main.switchToPanel(mainFrame, new SellerHome(mainFrame)));
-        add(backButton, BorderLayout.NORTH);
 
-        // Table Setup
+        JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        northPanel.setBackground(BACKGROUND_COLOR);
+        northPanel.add(backButton);
+        add(northPanel, BorderLayout.NORTH);
+
+        // --- Table Setup ---
         String[] columnNames = {"S.No.", "Auction ID", "Item Name", "Final Amount", "Winner", "Details"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Only the "Details" column is clickable/editable
-                return column == 5; 
+                return column == 5; // Only "Details" column is editable (button)
             }
         };
+
         pastBidsTable = new JTable(tableModel);
         pastBidsTable.setRowHeight(30);
+        pastBidsTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        pastBidsTable.setBackground(Color.WHITE);
+        pastBidsTable.setForeground(TEXT_COLOR);
+        pastBidsTable.setSelectionBackground(TABLE_SELECTION);
+        pastBidsTable.setSelectionForeground(Color.WHITE);
+        pastBidsTable.setGridColor(new Color(230, 230, 250));
 
-        // Custom Renderer/Editor for the Details column
+        // --- Table Header Styling ---
+        pastBidsTable.getTableHeader().setBackground(TABLE_HEADER_COLOR);
+        pastBidsTable.getTableHeader().setForeground(Color.WHITE);
+        pastBidsTable.getTableHeader().setFont(new Font("Segoe UI Semibold", Font.BOLD, 14));
+        pastBidsTable.getTableHeader().setReorderingAllowed(false);
+        pastBidsTable.getTableHeader().setResizingAllowed(false);
+
+        // --- Action Button Column ---
         pastBidsTable.getColumn("Details").setCellRenderer(new ButtonRenderer());
-        // Use an anonymous function to handle the button click action
         pastBidsTable.getColumn("Details").setCellEditor(new ButtonEditor(new JTextField(), this::viewWinnerDetails));
 
-        add(new JScrollPane(pastBidsTable), BorderLayout.CENTER);
+        // --- Add ScrollPane ---
+        JScrollPane scrollPane = new JScrollPane(pastBidsTable);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 250), 1));
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        add(scrollPane, BorderLayout.CENTER);
 
         loadPastBids();
     }
 
+    private void styleButton(JButton button, Color bg, Color fg) {
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(BUTTON_HOVER);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bg);
+            }
+        });
+    }
+
     private void loadPastBids() {
         tableModel.setRowCount(0); // Clear existing data
-        
+
         List<BackendClient.AuctionItemDto> allAuctions = BackendClient.getAuctionsBySellerEmail(Main.email);
-        
-        // Filter by status = 'CLOSE'
+
+        // Filter closed auctions
         List<BackendClient.AuctionItemDto> closedAuctions = allAuctions.stream()
             .filter(a -> "CLOSE".equalsIgnoreCase(a.status()))
             .collect(Collectors.toList());
@@ -60,14 +113,11 @@ public class SellerPastBids extends JPanel {
             BackendClient.AuctionItemDto auction = closedAuctions.get(i);
             Long auctionId = auction.auctionId();
 
-            // Fetch Final Amount and Winner Name (use AtomicReference for mutation in lambdas)
             java.util.concurrent.atomic.AtomicReference<String> finalAmountRef = new java.util.concurrent.atomic.AtomicReference<>("N/A");
             java.util.concurrent.atomic.AtomicReference<String> winnerNameRef = new java.util.concurrent.atomic.AtomicReference<>("N/A");
 
             BackendClient.getHighestBid(auctionId).ifPresent(bid -> {
                 finalAmountRef.set(String.format("$%.2f", bid.bidAmount()));
-
-                // Flow: auction_id -> getHighestBid() -> bid_id -> getBidderbyId() -> bidder_name
                 if (bid.bidderId() != null) {
                     BackendClient.getBidderById(bid.bidderId()).ifPresent(bidder -> {
                         winnerNameRef.set(bidder.bidderName());
@@ -75,13 +125,12 @@ public class SellerPastBids extends JPanel {
                 }
             });
 
-            // Columns: S.No., Auction ID, Item Name, Final Amount, Winner, Details
             tableModel.addRow(new Object[]{
-                i + 1, 
-                auctionId, 
+                i + 1,
+                auctionId,
                 auction.title(),
-                finalAmountRef.get(), 
-                winnerNameRef.get(), 
+                finalAmountRef.get(),
+                winnerNameRef.get(),
                 "View Details"
             });
         }
@@ -94,17 +143,14 @@ public class SellerPastBids extends JPanel {
     private void viewWinnerDetails(int row) {
         if (row < 0 || row >= tableModel.getRowCount()) return;
         Long auctionId = (Long) tableModel.getValueAt(row, 1);
-        
-        // Final Amount for the winner is the Highest Bid amount
+
         BackendClient.getHighestBid(auctionId).ifPresentOrElse(bid -> {
             if (bid.bidderId() == null) {
                 showMessageDialog(mainFrame, "No winner found for this auction (no bids placed).", "No Winner", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            
-            // Flow: auction_id -> getHighestBid() -> bid_id -> getBidderbyId()
+
             BackendClient.getBidderById(bid.bidderId()).ifPresentOrElse(bidder -> {
-                
                 String details = String.format(
                     "Winner Name: %s\nEmail: %s\nPhone No: %s\nAddress: %s\n\nFinal Bid Amount: $%.2f",
                     bidder.bidderName(),
@@ -116,28 +162,37 @@ public class SellerPastBids extends JPanel {
 
                 JTextArea textArea = new JTextArea(details);
                 textArea.setEditable(false);
+                textArea.setBackground(Color.WHITE);
+                textArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
                 JScrollPane scrollPane = new JScrollPane(textArea);
-                scrollPane.setPreferredSize(new Dimension(300, 200));
+                scrollPane.setPreferredSize(new Dimension(320, 200));
 
                 showMessageDialog(mainFrame, scrollPane, "Winner Details - " + tableModel.getValueAt(row, 2), JOptionPane.INFORMATION_MESSAGE);
-
             }, () -> showMessageDialog(mainFrame, "Failed to load winner profile.", "Error", JOptionPane.ERROR_MESSAGE));
-
         }, () -> showMessageDialog(mainFrame, "Could not find final bid details.", "Error", JOptionPane.ERROR_MESSAGE));
     }
 
-    // Custom Button Renderer for the JTable (Copied from SellerCurrentBids)
+    // --- Button Renderer ---
     class ButtonRenderer extends JButton implements TableCellRenderer {
-        public ButtonRenderer() { setOpaque(true); }
+        public ButtonRenderer() {
+            setOpaque(true);
+            setBackground(BUTTON_COLOR);
+            setForeground(Color.WHITE);
+            setFont(new Font("Segoe UI", Font.BOLD, 12));
+            setFocusPainted(false);
+        }
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             setText((value == null) ? "" : value.toString());
+            if (isSelected) setBackground(BUTTON_HOVER);
+            else setBackground(BUTTON_COLOR);
             return this;
         }
     }
 
-    // Custom Button Editor for the JTable (Copied from SellerCurrentBids)
+    // --- Button Editor ---
     class ButtonEditor extends DefaultCellEditor {
         private final JButton button;
         private String label;
@@ -149,6 +204,11 @@ public class SellerPastBids extends JPanel {
             this.actionHandler = actionHandler;
             button = new JButton();
             button.setOpaque(true);
+            button.setBackground(BUTTON_COLOR);
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            button.setFocusPainted(false);
+
             button.addActionListener(e -> fireEditingStopped());
         }
 
@@ -163,9 +223,7 @@ public class SellerPastBids extends JPanel {
 
         @Override
         public Object getCellEditorValue() {
-            if (isPushed) {
-                actionHandler.accept(pastBidsTable.getSelectedRow());
-            }
+            if (isPushed) actionHandler.accept(pastBidsTable.getSelectedRow());
             isPushed = false;
             return label;
         }
