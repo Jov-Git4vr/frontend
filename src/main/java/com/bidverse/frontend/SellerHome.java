@@ -15,7 +15,8 @@ public class SellerHome extends JPanel {
     private static final Font MAIN_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font BUTTON_FONT = new Font("Segoe UI Semibold", Font.BOLD, 14);
 
-    private final JFrame mainFrame;
+    private JFrame mainFrame;
+    private MainFrame navigator;
 
     public SellerHome(JFrame frame) {
         this.mainFrame = frame;
@@ -88,6 +89,7 @@ public class SellerHome extends JPanel {
             if (confirm == JOptionPane.YES_OPTION) {
                 JOptionPane.showMessageDialog(mainFrame,
                         "Logged out successfully.", "Logout", JOptionPane.INFORMATION_MESSAGE);
+                navigator.showCard("login");        
                 System.exit(0);
             }
         });

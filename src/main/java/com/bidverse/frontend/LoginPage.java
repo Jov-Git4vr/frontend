@@ -134,6 +134,7 @@ public class LoginPage extends JPanel {
         if (ok) {
             Main.email = email;
             Main.idInitialize();
+            System.out.println(Main.sell_id);
             String userRole = AuthService.getCurrentUserRole();
 
             emailField.setText("");
