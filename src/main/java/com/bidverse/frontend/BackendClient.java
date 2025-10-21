@@ -115,9 +115,17 @@ public class BackendClient {
     /*
     public static boolean deleteSeller(String email) {
         // Backend uses GET for delete, following the backend code
+        System.out.println(email);
         return sendRequest("/sellers/delete/" + email, "GET", Optional.empty()).isPresent();
+<<<<<<< HEAD
     }
     */
+=======
+<<<<<<< HEAD
+    
+=======
+    }*/
+>>>>>>> 64ba3de660a053ea4f3a40f8900bc6faf37b7d33
 
     /*public static boolean deleteSeller(String email) {
     Optional<String> response = sendRequest("/sellers/delete/" + email, "GET", Optional.empty());
@@ -127,7 +135,13 @@ public class BackendClient {
         return result.equalsIgnoreCase("Seller deleted successfully");
     } else {
         return false;
+<<<<<<< HEAD
     }*/
+=======
+>>>>>>> c4cc4561fcb3dfd74251384768f9fb393fef7c57
+    }
+}
+>>>>>>> 64ba3de660a053ea4f3a40f8900bc6faf37b7d33
 
     public static boolean deleteSeller(String email) {
     Optional<String> response = sendRequest("/sellers/delete/" + email, "GET", Optional.empty());
