@@ -1,7 +1,7 @@
 package com.bidverse.frontend;
 
 
-//import com.mycompany.bidverse.MainFrame;
+import com.bidverse.frontend.MainFrame;import com.bidverse.frontend.BackendClient;
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,7 +25,7 @@ public class Main {
         frame.repaint();
     }   
 
-    static void idInitialize(){
+    /*static void idInitialize(){
         BackendClient.getSellerByEmail(email).ifPresentOrElse(seller -> {
 
             sell_id = seller.sellerId();
@@ -55,7 +55,7 @@ public class Main {
             System.out.println(email);
 
         });
-    } 
+    } */
     
 }
 

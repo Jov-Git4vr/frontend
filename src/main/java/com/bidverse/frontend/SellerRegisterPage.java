@@ -74,8 +74,8 @@ public class SellerRegisterPage extends JPanel {
         String shop = shopField.getText().trim();
         String address = addressField.getText().trim();
 
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Name, email and password are required", "Validation",
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || shop.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name, email ,shopname and password are required", "Validation",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
