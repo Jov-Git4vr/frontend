@@ -74,6 +74,13 @@ public class BidderRegisterPage extends JPanel {
             return;
         }
 
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (!email.matches(emailRegex)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         boolean ok = BidderService.register(name, email, password, phone, address);
         if (ok) {
             // Display success message
