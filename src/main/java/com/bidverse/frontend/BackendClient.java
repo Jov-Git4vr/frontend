@@ -114,7 +114,9 @@ public class BackendClient {
 
     public static boolean deleteSeller(String email) {
         // Backend uses GET for delete, following the backend code
+        System.out.println(email);
         return sendRequest("/sellers/delete/" + email, "GET", Optional.empty()).isPresent();
+    
     }
 
     public static List<AuctionItemDto> getAuctionsBySellerEmail(String email) {

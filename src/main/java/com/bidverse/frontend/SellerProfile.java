@@ -210,6 +210,7 @@ public class SellerProfile extends JPanel {
 
         if (confirm == JOptionPane.YES_OPTION) {
             if (BackendClient.deleteSeller(Main.email)) {
+                System.out.println(Main.sell_id);
                 showMessageDialog(mainFrame, "Account deleted. Logging out.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 System.exit(0);
             } else {
