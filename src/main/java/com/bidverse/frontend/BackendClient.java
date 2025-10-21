@@ -119,13 +119,13 @@ public class BackendClient {
         return sendRequest("/sellers/delete/" + email, "GET", Optional.empty()).isPresent();
 <<<<<<< HEAD
     }
-    */
+    
 =======
 <<<<<<< HEAD
     
 =======
     }*/
->>>>>>> 64ba3de660a053ea4f3a40f8900bc6faf37b7d33
+//>>>>>>> 64ba3de660a053ea4f3a40f8900bc6faf37b7d33
 
     /*public static boolean deleteSeller(String email) {
     Optional<String> response = sendRequest("/sellers/delete/" + email, "GET", Optional.empty());
@@ -136,12 +136,8 @@ public class BackendClient {
     } else {
         return false;
 <<<<<<< HEAD
-    }*/
-=======
->>>>>>> c4cc4561fcb3dfd74251384768f9fb393fef7c57
     }
-}
->>>>>>> 64ba3de660a053ea4f3a40f8900bc6faf37b7d33
+    */
 
     public static boolean deleteSeller(String email) {
     Optional<String> response = sendRequest("/sellers/delete/" + email, "GET", Optional.empty());
