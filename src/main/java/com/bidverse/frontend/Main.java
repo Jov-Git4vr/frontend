@@ -25,7 +25,7 @@ public class Main {
         frame.repaint();
     }   
 
-    /*static void idInitialize(){
+    static void idInitialize(){
         BackendClient.getSellerByEmail(email).ifPresentOrElse(seller -> {
 
             sell_id = seller.sellerId();
@@ -55,7 +55,7 @@ public class Main {
             System.out.println(email);
 
         });
-    } */
+    } 
     
 }
 
