@@ -68,8 +68,8 @@ public class BidderRegisterPage extends JPanel {
         String phone = phoneField.getText().trim();
         String address = addressField.getText().trim();
 
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Name, email and password are required", "Validation",
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || address.isEmpty() || phone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name, email,address,phone no. and password are required", "Validation",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }

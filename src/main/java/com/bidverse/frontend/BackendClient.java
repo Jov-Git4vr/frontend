@@ -112,12 +112,27 @@ public class BackendClient {
                 });
     }
 
-    public static boolean deleteSeller(String email) {
+    /*public static boolean deleteSeller(String email) {
         // Backend uses GET for delete, following the backend code
         System.out.println(email);
         return sendRequest("/sellers/delete/" + email, "GET", Optional.empty()).isPresent();
+<<<<<<< HEAD
     
+=======
+    }*/
+
+    public static boolean deleteSeller(String email) {
+    Optional<String> response = sendRequest("/sellers/delete/" + email, "GET", Optional.empty());
+    if (response.isPresent()) {
+        String result = response.get();
+        // Only consider it successful if backend confirms deletion
+        return result.equalsIgnoreCase("Seller deleted successfully");
+    } else {
+        return false;
+>>>>>>> c4cc4561fcb3dfd74251384768f9fb393fef7c57
     }
+}
+
 
     public static List<AuctionItemDto> getAuctionsBySellerEmail(String email) {
         return sendRequest("/auctions/seller/email/" + email, "GET", Optional.empty())

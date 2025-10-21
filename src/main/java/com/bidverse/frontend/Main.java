@@ -1,7 +1,7 @@
 package com.bidverse.frontend;
 
 
-//import com.mycompany.bidverse.MainFrame;
+import com.bidverse.frontend.MainFrame;import com.bidverse.frontend.BackendClient;
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
